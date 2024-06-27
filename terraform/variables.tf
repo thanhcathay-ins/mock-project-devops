@@ -19,8 +19,13 @@ variable "private_subnet_cidr_block" {
   type        = string
 }
 
-variable "availability_zone" {
-  description = "The availability zone for the subnets"
+variable "availability_zone_1" {
+  description = "The availability zone 1 for the subnets"
+  type        = string
+}
+
+variable "availability_zone_2" {
+  description = "The availability zone 2 for the subnets"
   type        = string
 }
 
@@ -34,15 +39,6 @@ variable "jenkins_instance_type" {
   type        = string
 }
 
-variable "gitea_ami" {
-  description = "The AMI ID for the Gitea server"
-  type        = string
-}
-
-variable "gitea_instance_type" {
-  description = "The instance type for the Gitea server"
-  type        = string
-}
 
 variable "docker_registry_ami" {
   description = "The AMI ID for the Docker Registry server"

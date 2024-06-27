@@ -1,9 +1,5 @@
-output "jenkins_public_ip" {
-  value = module.jenkins.public_ip
-}
-
-output "gitea_public_ip" {
-  value = module.gitea.public_ip
+output "jenkins_gitea_public_ip" {
+  value = module.jenkins-gitea-server.public_ip
 }
 
 output "docker_registry_public_ip" {

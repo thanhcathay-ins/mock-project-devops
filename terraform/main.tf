@@ -7,30 +7,23 @@ module "vpc" {
   cidr_block              = var.vpc_cidr_block
   public_subnet_cidr      = var.public_subnet_cidr_block  # Sử dụng đúng tên biến
   private_subnet_cidr     = var.private_subnet_cidr_block  # Sử dụng đúng tên biến
-  availability_zone       = var.availability_zone
+  availability_zone_1       = var.availability_zone_1
+  availability_zone_2       = var.availability_zone_2
 }
 
-module "jenkins" {
+module "jenkins-gitea-server" {
   source        = "./modules/ec2"
   ami           = var.jenkins_ami
   instance_type = var.jenkins_instance_type
   subnet_id     = module.vpc.public_subnet_id
-  name          = "jenkins-server"
-}
-
-module "gitea" {
-  source        = "./modules/ec2"
-  ami           = var.gitea_ami
-  instance_type = var.gitea_instance_type
-  subnet_id     = module.vpc.public_subnet_id
-  name          = "gitea-server"
+  name          = "jenkins-gitea-server"
 }
 
 module "docker_registry" {
   source        = "./modules/ec2"
   ami           = var.docker_registry_ami
   instance_type = var.docker_registry_instance_type
-  subnet_id     = module.vpc.public_subnet_id
+  subnet_id     = module.vpc.private_subnet_id
   name          = "docker-registry-server"
 }
 
