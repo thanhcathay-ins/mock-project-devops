@@ -5,8 +5,8 @@ provider "aws" {
 module "vpc" {
   source                  = "./modules/vpc"
   cidr_block              = var.vpc_cidr_block
-  public_subnet_cidr      = var.public_subnet_cidr_block  # Sử dụng đúng tên biến
-  private_subnet_cidr     = var.private_subnet_cidr_block  # Sử dụng đúng tên biến
+  public_subnet_cidr      = var.public_subnet_cidr_block
+  private_subnet_cidr     = var.private_subnet_cidr_block
   availability_zone_1       = var.availability_zone_1
   availability_zone_2       = var.availability_zone_2
 }
