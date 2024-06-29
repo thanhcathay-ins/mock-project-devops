@@ -7,8 +7,8 @@ module "vpc" {
   cidr_block              = var.vpc_cidr_block
   public_subnet_cidr      = var.public_subnet_cidr_block
   private_subnet_cidr     = var.private_subnet_cidr_block
-  availability_zone_1       = var.availability_zone_1
-  availability_zone_2       = var.availability_zone_2
+  availability_zone_1     = var.availability_zone_1
+  availability_zone_2     = var.availability_zone_2
 }
 
 module "jenkins-gitea-server" {
@@ -40,6 +40,13 @@ resource "aws_iam_role" "eks_cluster_role" {
           Service = "eks.amazonaws.com"
         }
         Effect = "Allow"
+      },
+      {
+        Action = "sts:AssumeRole"
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+        Effect = "Allow"
       }
     ]
   })
@@ -47,7 +54,10 @@ resource "aws_iam_role" "eks_cluster_role" {
   # Gắn IAM policy cho phép EKS quản lý EC2 instances
   managed_policy_arns = [
     "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy",
-    "arn:aws:iam::aws:policy/AmazonEKSServicePolicy"
+    "arn:aws:iam::aws:policy/AmazonEKSServicePolicy",
+    "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly",
+    "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy",
+    "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
   ]
 }
 
