@@ -40,17 +40,27 @@ variable "jenkins_instance_type" {
 }
 
 
-variable "docker_registry_ami" {
+variable "bastion_host_ami" {
   description = "The AMI ID for the Docker Registry server"
   type        = string
 }
 
-variable "docker_registry_instance_type" {
+variable "bastion_host_instance_type" {
   description = "The instance type for the Docker Registry server"
   type        = string
 }
 
 variable "eks_instance_type" {
   description = "The instance type for the EKS node group"
+  type        = string
+}
+
+variable "ssh_key_name_public" {
+  description = "The SSH key name to use for the instances"
+  type        = string
+}
+
+variable "ssh_key_name_private" {
+  description = "The SSH key name to use for the instances"
   type        = string
 }

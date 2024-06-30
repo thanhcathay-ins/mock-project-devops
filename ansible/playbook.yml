@@ -1,0 +1,19 @@
+---
+- hosts: bastion
+  become: yes
+  tasks:
+    - name: Ensure SSH key is present on Bastion Host
+      ansible.builtin.copy:
+        src: ./private_ip.pem
+        dest: /home/ec2-user/private_ip.pem
+        mode: '0600'
+      become: true
+    
+    - name: Change ownership of SSH key to ec2-user
+      ansible.builtin.command: chown ec2-user:ec2-user /home/ec2-user/private_ip.pem
+      become: true
+
+- hosts: jenkins_gitea
+  become: yes
+  roles:
+    - setup

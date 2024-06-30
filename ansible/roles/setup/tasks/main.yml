@@ -1,0 +1,109 @@
+---
+- name: Update and upgrade the system
+  yum:
+    name: "*"
+    state: latest
+  ignore_errors: yes
+
+# - name: Install EPEL repository
+#   yum:
+#     name: epel-release
+#     state: present
+
+- name: Install Docker
+  yum:
+    name: docker
+    state: present
+
+- name: Start and enable Docker service
+  systemd:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: Add user to docker group
+  user:
+    name: centos
+    groups: docker
+    append: yes
+
+- name: Install Docker Compose
+  get_url:
+    url: "https://github.com/docker/compose/releases/download/v2.15.1/docker-compose-{{ ansible_system }}-{{ ansible_architecture }}"
+    dest: /usr/local/bin/docker-compose
+    mode: '0755'
+
+# - name: Verify Docker Compose installation
+#   command: /usr/local/bin/docker-compose --version
+#   register: output
+#   failed_when: "'docker-compose version' not in output.stdout"
+
+- name: Add Amazon Corretto repository
+  yum_repository:
+    name: corretto
+    description: Amazon Corretto
+    baseurl: https://rpm.corretto.aws/x86_64
+    gpgkey: https://rpm.corretto.aws/corretto.key
+    gpgcheck: yes
+
+- name: Install JDK 17
+  yum:
+    name: java-17-amazon-corretto-devel
+    state: present
+
+- name: Verify JDK 17 installation
+  command: java -version
+  register: java_output
+  failed_when: "'openjdk version' not in java_output.stderr"
+
+
+- name: Create /opt/gitlab directory if it doesn't exist
+  file:
+    path: /opt/gitlab
+    state: directory
+    mode: '0755'
+
+- name: Create /opt/jenkins directory if it doesn't exist
+  file:
+    path: /opt/jenkins
+    state: directory
+    mode: '0755'
+
+- name: Create /opt/kube directory if it doesn't exist
+  file:
+    path: /opt/kube
+    state: directory
+    mode: '0755'
+
+- name: Copy Docker Compose file for Gitea
+  copy:
+    src: gitlab/docker-compose.yml
+    dest: /opt/gitlab/docker-compose.yml
+
+- name: Start Gitea using Docker Compose
+  command: docker-compose -f /opt/gitlab/docker-compose.yml up -d
+  args:
+    chdir: /opt/gitlab
+
+- name: Copy Docker Compose file for Jenkins
+  copy:
+    src: jenkins/docker-compose.yml
+    dest: /opt/jenkins/docker-compose.yml
+
+- name: Copy Dockerfile for Jenkins
+  copy:
+    src: jenkins/Dockerfile
+    dest: /opt/jenkins/Dockerfile
+
+- name: Copy kubeconfig for Jenkins
+  copy:
+    src: jenkins/config
+    dest: /opt/kube/config
+
+- name: Build Jenkins Docker image
+  command: docker build -t jenkins-blueocean -f /opt/jenkins/Dockerfile /opt/jenkins
+
+- name: Start Jenkins using Docker Compose
+  command: docker-compose -f /opt/jenkins/docker-compose.yml up -d
+  args:
+    chdir: /opt/jenkins

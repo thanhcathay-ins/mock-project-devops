@@ -1,0 +1,40 @@
+version: '3.0'
+networks:
+  jenkins:
+    driver: bridge
+
+services:
+  jenkins-docker:
+    image: docker:dind
+    container_name: jenkins-docker
+    privileged: true
+    restart: always
+    networks:
+      - jenkins
+    environment:
+      DOCKER_TLS_CERTDIR: ""
+    command: ["dockerd", "--host=tcp://0.0.0.0:2375", "--host=unix:///var/run/docker.sock"]
+    volumes:
+      - jenkins-data:/var/jenkins_home
+    ports:
+      - 2375:2375  # Sử dụng cổng 2375 khi không sử dụng TLS
+
+  jenkins-blueocean:
+    image: jenkins-blueocean
+    container_name: jenkins-blueocean
+    restart: always
+    networks:
+      - jenkins
+    environment:
+      - DOCKER_HOST=tcp://jenkins-docker:2375
+    volumes:
+      - jenkins-data:/var/jenkins_home
+      - jenkins-log:/var/log/jenkins
+      - /opt/kube:/var/jenkins_home/.kube
+    ports:
+      - 8080:8080
+      - 50000:50000
+
+volumes:
+  jenkins-data:
+  jenkins-log:
