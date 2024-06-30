@@ -1,29 +1,29 @@
 variable "ami" {
-  description = "The AMI to use for the instance"
+  description = "AMI ID"
   type        = string
 }
 
 variable "instance_type" {
-  description = "The type of instance to start"
+  description = "Instance type"
   type        = string
 }
 
 variable "subnet_id" {
-  description = "The VPC subnet ID to launch in"
-  type        = string
-}
-
-variable "name" {
-  description = "The name of the instance"
+  description = "Subnet ID"
   type        = string
 }
 
 variable "key_name" {
-  description = "The SSH key name to use for the instance"
+  description = "SSH key name"
+  type        = string
+}
+
+variable "name" {
+  description = "Name tag for the instance"
   type        = string
 }
 
 variable "security_group_ids" {
-  description = "The security group IDs to associate with the instance"
+  description = "Security group IDs"
   type        = list(string)
 }

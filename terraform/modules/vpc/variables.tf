@@ -3,22 +3,32 @@ variable "cidr_block" {
   type        = string
 }
 
-variable "public_subnet_cidr" {
-  description = "The CIDR block for the public subnet"
+variable "public_subnet_cidr_block_1" {
+  description = "CIDR block for the first public subnet"
   type        = string
 }
 
-variable "private_subnet_cidr" {
-  description = "The CIDR block for the private subnet"
+variable "public_subnet_cidr_block_2" {
+  description = "CIDR block for the second public subnet"
+  type        = string
+}
+
+variable "private_subnet_cidr_block_1" {
+  description = "CIDR block for the first private subnet"
+  type        = string
+}
+
+variable "private_subnet_cidr_block_2" {
+  description = "CIDR block for the second private subnet"
   type        = string
 }
 
 variable "availability_zone_1" {
-  description = "The availability zone 1 for the subnets"
+  description = "The first availability zone"
   type        = string
 }
 
 variable "availability_zone_2" {
-  description = "The availability zone 2 for the subnets"
+  description = "The second availability zone"
   type        = string
 }
