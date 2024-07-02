@@ -13,6 +13,16 @@ variable "public_subnet_cidr_block_2" {
   type        = string
 }
 
+variable "private_subnet_cidr_block_1" {
+  description = "CIDR block for the first public subnet"
+  type        = string
+}
+
+variable "private_subnet_cidr_block_2" {
+  description = "CIDR block for the second public subnet"
+  type        = string
+}
+
 variable "availability_zone_1" {
   description = "The first availability zone"
   type        = string

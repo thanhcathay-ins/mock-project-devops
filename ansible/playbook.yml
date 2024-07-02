@@ -1,18 +1,92 @@
-# ---
-# - name: Ensure SSH keys are present on Bastion Host
-#   hosts: jenkins_gitea
-#   tasks:
-#     - name: Ensure SSH key for private instances is present on Bastion Host
-#       ansible.builtin.copy:
-#         src: ./private_ip.pem
-#         dest: /home/ec2-user/private_ip.pem
-#         mode: '0600'
-#       become: yes
+---
+- name: Ensure SSH keys are present on Bastion Host
+  become: yes
+  hosts: bastion
+  tasks:
+    - name: Ensure SSH key for private instances is present on Bastion Host
+      ansible.builtin.copy:
+        src: ./private_ip.pem
+        dest: /home/ec2-user/private_ip.pem
+        mode: '0600'
+      become: yes
 
-#     - name: Change ownership of SSH key to ec2-user
-#       ansible.builtin.command:
-#         cmd: chown ec2-user:ec2-user /home/ec2-user/private_ip.pem
-#       become: yes
+    - name: Change ownership of SSH key to ec2-user
+      ansible.builtin.command:
+        cmd: chown ec2-user:ec2-user /home/ec2-user/private_ip.pem
+      become: yes
+
+    - name: Update and upgrade the system
+      yum:
+        name: "*"
+        state: latest
+      ignore_errors: yes
+
+    # - name: Install EPEL repository
+    #   yum:
+    #     name: epel-release
+    #     state: present
+
+    - name: Install Docker
+      yum:
+        name: docker
+        state: present
+
+    - name: Start and enable Docker service
+      systemd:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Add user to docker group
+      user:
+        name: centos
+        groups: docker
+        append: yes
+
+    - name: Install Docker Compose
+      get_url:
+        url: "https://github.com/docker/compose/releases/download/v2.15.1/docker-compose-{{ ansible_system }}-{{ ansible_architecture }}"
+        dest: /usr/local/bin/docker-compose
+        mode: '0755'
+
+    # - name: Verify Docker Compose installation
+    #   command: /usr/local/bin/docker-compose --version
+    #   register: output
+    #   failed_when: "'docker-compose version' not in output.stdout"
+
+    - name: Add Amazon Corretto repository
+      yum_repository:
+        name: corretto
+        description: Amazon Corretto
+        baseurl: https://rpm.corretto.aws/x86_64
+        gpgkey: https://rpm.corretto.aws/corretto.key
+        gpgcheck: yes
+
+    - name: Install JDK 17
+      yum:
+        name: java-17-amazon-corretto-devel
+        state: present
+
+    - name: Verify JDK 17 installation
+      command: java -version
+      register: java_output
+      failed_when: "'openjdk version' not in java_output.stderr"
+
+    - name: Create /opt/gitlab directory if it doesn't exist
+      file:
+        path: /opt/gitlab
+        state: directory
+        mode: '0755'
+
+    - name: Copy Docker Compose file for Gitea
+      copy:
+        src: roles/setup/files/gitlab/docker-compose.yml
+        dest: /opt/gitlab/docker-compose.yml
+
+    - name: Start Gitea using Docker Compose
+      command: docker-compose -f /opt/gitlab/docker-compose.yml up -d
+      args:
+        chdir: /opt/gitlab
 
 - hosts: jenkins_gitea
   become: yes

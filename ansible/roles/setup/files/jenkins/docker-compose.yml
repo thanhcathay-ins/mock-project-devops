@@ -27,6 +27,7 @@ services:
       - jenkins
     environment:
       - DOCKER_HOST=tcp://jenkins-docker:2375
+      - JENKINS_OPTS=--prefix=/jenkins
     volumes:
       - jenkins-data:/var/jenkins_home
       - jenkins-log:/var/log/jenkins

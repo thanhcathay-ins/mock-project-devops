@@ -55,14 +55,7 @@
   command: java -version
   register: java_output
   failed_when: "'openjdk version' not in java_output.stderr"
-
-
-- name: Create /opt/gitlab directory if it doesn't exist
-  file:
-    path: /opt/gitlab
-    state: directory
-    mode: '0755'
-
+  
 - name: Create /opt/jenkins directory if it doesn't exist
   file:
     path: /opt/jenkins
@@ -74,16 +67,6 @@
     path: /opt/kube
     state: directory
     mode: '0755'
-
-- name: Copy Docker Compose file for Gitea
-  copy:
-    src: gitlab/docker-compose.yml
-    dest: /opt/gitlab/docker-compose.yml
-
-- name: Start Gitea using Docker Compose
-  command: docker-compose -f /opt/gitlab/docker-compose.yml up -d
-  args:
-    chdir: /opt/gitlab
 
 - name: Copy Docker Compose file for Jenkins
   copy:
@@ -107,3 +90,6 @@
   command: docker-compose -f /opt/jenkins/docker-compose.yml up -d
   args:
     chdir: /opt/jenkins
+
+- name: Allow HTTP traffic on port 8080
+  shell: "iptables -I INPUT -p tcp --dport 8080 -j ACCEPT"
