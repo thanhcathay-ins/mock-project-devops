@@ -55,7 +55,36 @@
   command: java -version
   register: java_output
   failed_when: "'openjdk version' not in java_output.stderr"
-  
+
+- name: Install sudo
+  yum:
+    name: sudo
+    state: present
+
+- name: Install AWS CLI
+  get_url:
+    url: "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip"
+    dest: /tmp/awscliv2.zip
+
+- name: Unzip AWS CLI installer
+  unarchive:
+    src: /tmp/awscliv2.zip
+    dest: /tmp
+    remote_src: yes
+
+- name: Run AWS CLI installer
+  command: /tmp/aws/install
+
+- name: Clean up AWS CLI installer
+  file:
+    path: /tmp/awscliv2.zip
+    state: absent
+
+- name: Verify AWS CLI installation
+  command: aws --version
+  register: aws_output
+  failed_when: "'aws-cli' not in aws_output.stdout"
+
 - name: Create /opt/jenkins directory if it doesn't exist
   file:
     path: /opt/jenkins
@@ -93,3 +122,17 @@
 
 - name: Allow HTTP traffic on port 8080
   shell: "iptables -I INPUT -p tcp --dport 8080 -j ACCEPT"
+
+- name: Install sudo in Jenkins Dockerfile
+  lineinfile:
+    path: /opt/jenkins/Dockerfile
+    line: "RUN yum install -y sudo"
+
+- name: Install AWS CLI in Jenkins Dockerfile
+  lineinfile:
+    path: /opt/jenkins/Dockerfile
+    line: |
+      RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
+          unzip awscliv2.zip && \
+          ./aws/install && \
+          rm -rf awscliv2.zip aws
