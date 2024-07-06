@@ -1,4 +1,3 @@
-# Cấu hình provider AWS
 provider "aws" {
   region = "ap-southeast-1"
 }
@@ -78,7 +77,7 @@ resource "aws_iam_role" "eks_cluster_role" {
       {
         Action = "sts:AssumeRole"
         Principal = {
-          Service = ["eks.amazonaws.com", "ec2.amazonaws.com"]
+          Service = ["eks.amazonaws.com"]
         }
         Effect = "Allow"
       }
@@ -87,11 +86,40 @@ resource "aws_iam_role" "eks_cluster_role" {
 
   # Gắn IAM policy cho phép EKS quản lý EC2 instances
   managed_policy_arns = [
+    "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy",
+    "arn:aws:iam::aws:policy/AmazonEKSServicePolicy"
+  ]
+}
+
+# Tạo IAM role cho EKS node group
+resource "aws_iam_role" "eks_node_group_role" {
+  name = "eks_node_group_role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+        Effect = "Allow"
+      }
+    ]
+  })
+
+  # Gắn IAM policy cho phép các node trong EKS node group
+  managed_policy_arns = [
     "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy",
     "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy",
     "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
   ]
+}
 
+# Tạo instance profile cho node group
+resource "aws_iam_instance_profile" "eks_node_group_instance_profile" {
+  name = "eks_node_group_instance_profile"
+  role = aws_iam_role.eks_node_group_role.name
 }
 
 # Tạo EKS cluster
@@ -101,22 +129,26 @@ resource "aws_eks_cluster" "eks_cluster" {
   version  = "1.24"
 
   vpc_config {
-    subnet_ids         = [aws_subnet.public_subnet1.id, aws_subnet.public_subnet2.id]
+    subnet_ids              = [aws_subnet.public_subnet1.id, aws_subnet.public_subnet2.id]
     endpoint_private_access = true
-    endpoint_public_access = true
+    endpoint_public_access  = true
   }
+
+  depends_on = [
+    aws_iam_role.eks_cluster_role
+  ]
 }
 
 # Tạo EKS node group
 resource "aws_eks_node_group" "eks_node_group" {
   cluster_name    = aws_eks_cluster.eks_cluster.name
   node_group_name = "eks_node_group"
-  node_role_arn   = aws_iam_role.eks_cluster_role.arn
+  node_role_arn   = aws_iam_role.eks_node_group_role.arn  # Sử dụng IAM role của node group
   subnet_ids      = [aws_subnet.public_subnet1.id, aws_subnet.public_subnet2.id]
 
   scaling_config {
-    desired_size = 0
-    min_size     = 0
+    desired_size = 1
+    min_size     = 1
     max_size     = 1
   }
 

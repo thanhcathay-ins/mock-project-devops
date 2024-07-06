@@ -91,12 +91,6 @@
     state: directory
     mode: '0755'
 
-- name: Create /opt/kube directory if it doesn't exist
-  file:
-    path: /opt/kube
-    state: directory
-    mode: '0755'
-
 - name: Copy Docker Compose file for Jenkins
   copy:
     src: jenkins/docker-compose.yml
@@ -111,6 +105,11 @@
   copy:
     src: jenkins/config
     dest: /opt/kube/config
+    
+- name: Copy kubeconfig for Jenkins
+  copy:
+    src: jenkins/config
+    dest: /var/jenkins_home/.kube/config
 
 - name: Build Jenkins Docker image
   command: docker build -t jenkins-blueocean -f /opt/jenkins/Dockerfile /opt/jenkins
@@ -123,16 +122,3 @@
 - name: Allow HTTP traffic on port 8080
   shell: "iptables -I INPUT -p tcp --dport 8080 -j ACCEPT"
 
-- name: Install sudo in Jenkins Dockerfile
-  lineinfile:
-    path: /opt/jenkins/Dockerfile
-    line: "RUN yum install -y sudo"
-
-- name: Install AWS CLI in Jenkins Dockerfile
-  lineinfile:
-    path: /opt/jenkins/Dockerfile
-    line: |
-      RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
-          unzip awscliv2.zip && \
-          ./aws/install && \
-          rm -rf awscliv2.zip aws

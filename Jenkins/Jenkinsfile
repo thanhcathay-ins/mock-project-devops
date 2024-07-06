@@ -4,8 +4,8 @@ pipeline {
     environment {
         DOCKER_CREDENTIALS_ID = 'Dockerhub'
         DOCKER_IMAGE_NAME = 'duonghuuthanh/mock-project-devops'
-        KUBECONFIG_PATH = '/opt/kube/config' // Đường dẫn tới kubeconfig trong container Jenkins
-        CLUSTER_NAME = 'eks_cluster'
+        KUBECONFIG_PATH = '/var/jenkins_home/.kube/config' // Đường dẫn tới kubeconfig trong container Jenkins
+        CLUSTER_NAME = 'arn:aws:eks:ap-southeast-1:303142456260:cluster/eks_cluster'
     }
 
     stages {
@@ -77,15 +77,33 @@ pipeline {
             }
         }
 
+        stage('Verify Kubeconfig') {
+            steps {
+                script {
+                    echo "KUBECONFIG Path: ${env.KUBECONFIG_PATH}"
+                    sh 'cat ${KUBECONFIG_PATH}'
+                }
+            }
+        }
+
+        stage('Check Kubernetes Cluster') {
+            steps {
+                script {
+                    withEnv(["KUBECONFIG=${KUBECONFIG_PATH}"]) {
+                        sh 'kubectl config view'
+                        sh 'kubectl get nodes'
+                    }
+                }
+            }
+        }
+
         stage('Deploy to K8s') {
             steps {
                 script {
-                    withEnv(["KUBECONFIG=${env.KUBECONFIG_PATH}"]) {
+                    withEnv(["KUBECONFIG=${KUBECONFIG_PATH}"]) {
                         sh """
-                        kubectl config use-context ${env.CLUSTER_NAME}
-                        kubectl apply -f k8s/deployment-service.yaml --validate=false
-
-                        kubectl rollout status deployment/deployment-name --timeout=120s
+                        kubectl apply -f k8s/deployment-service.yaml --validate=false --v=9
+                        kubectl rollout status deployment/demo --timeout=120s --v=9
                         """
                     }
                 }
