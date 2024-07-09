@@ -91,6 +91,29 @@
     state: directory
     mode: '0755'
 
+
+- name: Create /opt/application-monitoring directory if it doesn't exist
+  file:
+    path: /opt/application-monitoring
+    state: directory
+    mode: '0755'
+
+- name: Create /opt/mongoDB directory if it doesn't exist
+  file:
+    path: /opt/mongoDB
+    state: directory
+    mode: '0755'
+
+- name: Copy file for application-monitoring
+  copy:
+    src: application-monitoring/
+    dest: /opt/application-monitoring/
+
+- name: Copy file for mongoDB
+  copy:
+    src: mongoDB/
+    dest: /opt/mongoDB/
+
 - name: Copy Docker Compose file for Jenkins
   copy:
     src: jenkins/docker-compose.yml
@@ -119,6 +142,21 @@
   args:
     chdir: /opt/jenkins
 
+- name: Start Application monitoring using Docker Compose
+  command: docker-compose -f /opt/application-monitoring/docker-compose.yml up -d
+  args:
+      chdir: /opt/application-monitoring
+
+- name: Start mongoDB using Docker Compose
+  command: docker-compose -f /opt/mongoDB/docker-compose.yml up -d
+  args:
+      chdir: /opt/mongoDB
+
 - name: Allow HTTP traffic on port 8080
   shell: "iptables -I INPUT -p tcp --dport 8080 -j ACCEPT"
 
+- name: Allow HTTP traffic on port 9090
+  shell: "iptables -I INPUT -p tcp --dport 9090 -j ACCEPT"
+
+- name: Allow HTTP traffic on port 3000
+  shell: "iptables -I INPUT -p tcp --dport 3000 -j ACCEPT"

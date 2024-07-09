@@ -1,13 +1,15 @@
-package com.example.demo;
+package com.github.sparsick.springbootexample.hero;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class DemoApplication {
+public class HeroApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(DemoApplication.class, args);
+		SpringApplication.run(HeroApplication.class, args);
 	}
+
+
 
 }

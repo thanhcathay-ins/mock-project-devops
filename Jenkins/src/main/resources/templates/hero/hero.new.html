@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Hero Form</title>
+
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+    <link rel="stylesheet" th:href="@{/webjars/font-awesome/css/all.css}">
+
+</head>
+<body>
+<main class="container">
+    <h1>New Hero</h1>
+
+    <form class="row-cols-2" th:action="@{/hero/new}" method="post" th:object="${newHero}">
+        <div class="row mb-3">
+            <label for="nameInput" class="col-sm-2 col-form-label">Name</label>
+            <div class="col-sm-10">
+                <input id="nameInput" type="text" class="form-control" th:field="*{hero.name}">
+            </div>
+        </div>
+        <div class="row mb-3">
+            <label for="cityInput" class="col-sm-2 col-form-label">City</label>
+            <div class="col-sm-10">
+                <input id="cityInput" type="text" class="form-control" th:field="*{hero.city}">
+            </div>
+        </div>
+        <div class="row mb-3">
+            <label for="universumInput" class="col-sm-2 col-form-label">Universum</label>
+            <div class="col-sm-10">
+                <select id="universumInput" class="form-select" th:field="*{hero.universum}">
+                    <option th:each="universum : ${T(com.github.sparsick.springbootexample.hero.universum.ComicUniversum).values()}"
+                            th:value="${universum}"
+                            th:text="${universum.displayName}">
+                    </option>
+                </select>
+            </div>
+        </div>
+        <button type="submit" class="btn btn-outline-secondary col-sm-2"><i class='fas fa-user-shield'></i> Add hero</button>
+    </form>
+</main>
+</body>
+</html>
