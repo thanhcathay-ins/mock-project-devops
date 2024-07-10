@@ -14,15 +14,17 @@ API for Prometheus: `http://IP:30007/actuator/prometheus`
 
 # Application (EC2 Private)
 
-## Grafana: http://IP:3000
+Grafana: http://IP:3000
 
  - Username: admin
 
  - Password: pass
 
-## Prometheus: http://IP:9090
-## Jenkins: name load blancer:8080
-## MongoDB: IP:27017
+Prometheus: http://IP:9090
+
+Jenkins: ALB:8080
+
+MongoDB: IP:27017
  - Username: root
  - Password: root123
 
