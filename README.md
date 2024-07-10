@@ -1,4 +1,12 @@
-# mock-project-devops
+# Technologies used in project
+- Gitea
+- Jenkins
+- Bastion host
+- Prometheus
+- Grafana
+- MongoDB
+
+# Devops
 
 Application URL: `http://IP:30007/hero`
 
