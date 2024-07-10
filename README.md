@@ -30,6 +30,18 @@ API for Prometheus: `http://IP:30007/actuator/prometheus`
 - Gitea : http://IP:3000
 
 # Install
+Clone the project
+
+```bash
+  git clone https://github.com/thanhcathay-ins/mock-project-devops.git
+```
+
+Go to the project directory
+
+```bash
+  cd mock-project-devops
+```
+
 ## Build Ec2
 ```
 cd ./terraform
