@@ -2,7 +2,7 @@
 
 
 # Architect
-![Logo](https://github.com/thanhcathay-ins/mock-project-devops/issues/1#issue-2402784393)
+<img src="https://github.com/thanhcathay-ins/mock-project-devops/issues/1#issue-2402784393" alt="..." width="250" />
 # Devops
 
 Application URL: `http://IP:30007/hero`
