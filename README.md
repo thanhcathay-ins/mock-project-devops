@@ -2,7 +2,7 @@
 
 
 # Architect
-<img src="https://github.com/thanhcathay-ins/mock-project-devops/assets/172091827/af23e7a5-c716-41ee-b964-0eca1a0048f2" alt="..." width="500" />
+<img src="https://github.com/thanhcathay-ins/mock-project-devops/assets/172091827/af23e7a5-c716-41ee-b964-0eca1a0048f2" alt="..." width="750" />
 
 
 # Devops
