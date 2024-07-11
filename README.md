@@ -1,11 +1,8 @@
-# Technologies used in project
-- Gitea
-- Jenkins
-- Bastion host
-- Prometheus
-- Grafana
-- MongoDB
 
+
+
+# Architect
+![](https://github.com/thanhcathay-ins/mock-project-devops/issues/1#issue-2402784393)
 # Devops
 
 Application URL: `http://IP:30007/hero`
